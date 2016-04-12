@@ -11,13 +11,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View.OnClickListener;
 
-import java.util.Random;
+/**
+ * @author  Oleksandr Gorkovets
+ * @version 2.0
+ * @date 4/11/2016
+ */
 
 public class MainActivity extends AppCompatActivity {
-    private int rand1 = 0;
-    private int rand2 = 0;
-    private int correct = 0;
-    private int total = 0;
+    private LearningGameModel game = new LearningGameModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,19 +26,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //generate random numbers and store them
-        rand1 = randNum();
-        rand2 = randNum();
         //set buttons to display our numbers
         setButton();
     }
 
     public void setButton(){
         Button button1 = (Button) findViewById(R.id.button1);
-        button1.setText(rand1 + "");
+        button1.setText(game.getLeftNumber() + "");
 
         Button button2 = (Button) findViewById(R.id.button2);
-        button2.setText(rand2 + "");
+        button2.setText(game.getRightNumber() + "");
 
         button1.setOnClickListener(new OnClickListener() {
             public void onClick(View view) {
@@ -57,39 +55,37 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+
     public void compareOnclick(View view){
         int clicked = view.getId();
         boolean result;
         String answer = "";
         if (clicked == R.id.button1) {
-            result = compareNum(rand1, rand2);
+            result = game.play(game.getLeftNumber(), game.getRightNumber());
         } else {
-            result = compareNum(rand2, rand1);
+            result = game.play(game.getRightNumber(), game.getLeftNumber());
         }
         if (result == true) {
             answer = "Good job!";
-            correct++;
-
         } else {
             answer = "Try more!";
         }
-        total++;
         Toast.makeText(getApplicationContext(), answer, Toast.LENGTH_SHORT).show();
         dispayMessages();
         //set new values
-        rand1 = randNum();
-        rand2 = randNum();
+        game.generateNumbers();
         //set buttons to display our numbers
         setButton();
     }
 
     public void dispayMessages(){
         TextView displayTotal = (TextView) findViewById(R.id.displayTotal);
-        displayTotal.setText("Total number of tries : " + total);
+        displayTotal.setText("Total number of tries : " + game.getGamesPlayed());
 
         TextView displayCorrect = (TextView) findViewById(R.id.displayCorrect);
-        displayCorrect.setText("Correct number of tries : " + correct);
+        displayCorrect.setText("Correct number of tries : " + game.getGamesWon());
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -101,25 +97,6 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
-    }
-
-
-
-    public boolean compareNum(int rand1, int rand2){
-        //boolean result = false;
-        if(rand1 > rand2){
-            return true;
-        }
-        else{
-            return false;
-        }
-        //return result;
-    }
-
-    public int randNum(){
-        Random random = new Random();
-        return random.nextInt(100) + 1;
     }
 }
